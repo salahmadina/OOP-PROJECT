@@ -20,6 +20,23 @@ public class CompoundManagementGUI extends JFrame {
     private static BusSchedules busScheduleSystem = new BusSchedules();
     private static QRGateSystem qrGateSystem = new QRGateSystem();
     private static ArrayList<Gate> compoundGates = new ArrayList<>();
+    // Shared in-memory request state so Residents and Staff see the same requests
+    private static final java.util.List<request> sharedRequests = new java.util.ArrayList<>();
+    private static final java.util.Map<request, String> requestStatuses = new java.util.HashMap<>();
+    private static final java.util.Map<request, Resident> requestOwners = new java.util.HashMap<>();
+    private static final java.util.Map<request, String> requestServices = new java.util.HashMap<>();
+    private static final java.util.Map<request, String> requestDetails = new java.util.HashMap<>();
+    // Simple view refresher registry
+    private static final java.util.Map<String, java.util.List<Runnable>> viewRefreshers = new java.util.HashMap<>();
+
+    private static void registerRefresher(String view, Runnable r) {
+        viewRefreshers.computeIfAbsent(view, k -> new java.util.ArrayList<>()).add(r);
+    }
+
+    private static void runRefreshers(String view) {
+        java.util.List<Runnable> list = viewRefreshers.get(view);
+        if (list != null) for (Runnable rr : list) try { rr.run(); } catch (Exception ignored) {}
+    }
 
     // --- GUI Components ---
     private JPanel mainContainer;
@@ -464,6 +481,66 @@ public class CompoundManagementGUI extends JFrame {
         return panel;
     }
 
+    private JPanel createStaffMainMenu(Staff s, JPanel contentPanel) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(new Color(236, 240, 241));
+        panel.setBorder(new EmptyBorder(40, 40, 40, 40));
+
+        JLabel titleLabel = new JLabel("Staff Dashboard");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        titleLabel.setForeground(SIDEBAR_COLOR);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subtitleLabel = new JLabel("Select an option to get started");
+        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        subtitleLabel.setForeground(Color.GRAY);
+        subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        headerPanel.setBackground(new Color(236, 240, 241));
+        headerPanel.add(titleLabel);
+        headerPanel.add(Box.createVerticalStrut(10));
+        headerPanel.add(subtitleLabel);
+
+        // Grid of buttons (same visual style as Resident)
+        JPanel gridPanel = new JPanel(new GridLayout(3, 2, 20, 20));
+        gridPanel.setBackground(new Color(236, 240, 241));
+        gridPanel.setBorder(new EmptyBorder(50, 50, 50, 50));
+
+        CardLayout cl = (CardLayout) contentPanel.getLayout();
+
+        JButton residentsBtn = createDashboardButton("👥 Manage Residents", "View and remove residents", new Color(52, 152, 219));
+        residentsBtn.addActionListener(e -> cl.show(contentPanel, "RESIDENTS"));
+
+        JButton reportsBtn = createDashboardButton("📋 Assigned Reports", "Handle assigned reports", new Color(231, 76, 60));
+        reportsBtn.addActionListener(e -> cl.show(contentPanel, "REPORTS"));
+
+        JButton requestsBtn = createDashboardButton("🔧 Service Requests", "Respond to resident requests", new Color(39, 174, 96));
+        requestsBtn.addActionListener(e -> cl.show(contentPanel, "REQUESTS"));
+
+        JButton logsBtn = createDashboardButton("📊 Gate Logs", "View gate entry logs", new Color(155, 89, 182));
+        logsBtn.addActionListener(e -> cl.show(contentPanel, "LOGS"));
+
+        JButton profileBtn = createDashboardButton("👤 My Profile", "View your profile info", new Color(241, 196, 15));
+        profileBtn.addActionListener(e -> cl.show(contentPanel, "PROFILE"));
+
+        JButton helpBtn = createDashboardButton("❓ Help & Info", "Get help and information", new Color(52, 73, 94));
+        helpBtn.addActionListener(e -> JOptionPane.showMessageDialog(panel, "For support, contact the compound office.\nPhone: +1-XXX-XXX-XXXX"));
+
+        gridPanel.add(residentsBtn);
+        gridPanel.add(reportsBtn);
+        gridPanel.add(requestsBtn);
+        gridPanel.add(logsBtn);
+        gridPanel.add(profileBtn);
+        gridPanel.add(helpBtn);
+
+        panel.add(headerPanel, BorderLayout.NORTH);
+        panel.add(gridPanel, BorderLayout.CENTER);
+
+        return panel;
+    }
+
     private JButton createDashboardButton(String title, String subtitle, Color color) {
         JButton btn = new JButton("<html><center><font size='5'>" + title + "</font><br><font size='3'>" + subtitle + "</font></center></html>");
         btn.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -524,91 +601,19 @@ public class CompoundManagementGUI extends JFrame {
         contentPanel.add(createStaffRequestsPanel(), "REQUESTS");
         contentPanel.add(createGateLogsPanel(), "LOGS");
         contentPanel.add(createProfilePanel(s), "PROFILE");
+        contentPanel.add(createStaffMainMenu(s, contentPanel), "MAIN");
 
-        JButton residentsBtn = new JButton("👥 Manage Residents");
-        residentsBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        residentsBtn.setMaximumSize(new Dimension(180, 40));
-        residentsBtn.setBackground(SIDEBAR_COLOR);
-        residentsBtn.setForeground(Color.WHITE);
-        residentsBtn.setFocusPainted(false);
-        residentsBtn.setBorderPainted(false);
-        residentsBtn.setFont(REGULAR_FONT);
-        residentsBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        residentsBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) { residentsBtn.setBackground(new Color(44, 62, 80)); }
-            public void mouseExited(java.awt.event.MouseEvent evt) { residentsBtn.setBackground(SIDEBAR_COLOR); }
-        });
-        residentsBtn.addActionListener(e -> ((CardLayout)contentPanel.getLayout()).show(contentPanel, "RESIDENTS"));
-        sidebar.add(residentsBtn);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        // Show main menu first (Resident-like behavior)
+        CardLayout cl = (CardLayout) contentPanel.getLayout();
+        cl.show(contentPanel, "MAIN");
 
-        JButton reportsBtn = new JButton("📋 Assigned Reports");
-        reportsBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        reportsBtn.setMaximumSize(new Dimension(180, 40));
-        reportsBtn.setBackground(SIDEBAR_COLOR);
-        reportsBtn.setForeground(Color.WHITE);
-        reportsBtn.setFocusPainted(false);
-        reportsBtn.setBorderPainted(false);
-        reportsBtn.setFont(REGULAR_FONT);
-        reportsBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        reportsBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) { reportsBtn.setBackground(new Color(44, 62, 80)); }
-            public void mouseExited(java.awt.event.MouseEvent evt) { reportsBtn.setBackground(SIDEBAR_COLOR); }
-        });
-        reportsBtn.addActionListener(e -> ((CardLayout)contentPanel.getLayout()).show(contentPanel, "REPORTS"));
-        sidebar.add(reportsBtn);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        JButton requestsBtn = new JButton("🔧 Service Requests");
-        requestsBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        requestsBtn.setMaximumSize(new Dimension(180, 40));
-        requestsBtn.setBackground(SIDEBAR_COLOR);
-        requestsBtn.setForeground(Color.WHITE);
-        requestsBtn.setFocusPainted(false);
-        requestsBtn.setBorderPainted(false);
-        requestsBtn.setFont(REGULAR_FONT);
-        requestsBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        requestsBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) { requestsBtn.setBackground(new Color(44, 62, 80)); }
-            public void mouseExited(java.awt.event.MouseEvent evt) { requestsBtn.setBackground(SIDEBAR_COLOR); }
-        });
-        requestsBtn.addActionListener(e -> ((CardLayout)contentPanel.getLayout()).show(contentPanel, "REQUESTS"));
-        sidebar.add(requestsBtn);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        JButton logsBtn = new JButton("📊 Gate Entry Logs");
-        logsBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        logsBtn.setMaximumSize(new Dimension(180, 40));
-        logsBtn.setBackground(SIDEBAR_COLOR);
-        logsBtn.setForeground(Color.WHITE);
-        logsBtn.setFocusPainted(false);
-        logsBtn.setBorderPainted(false);
-        logsBtn.setFont(REGULAR_FONT);
-        logsBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        logsBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) { logsBtn.setBackground(new Color(44, 62, 80)); }
-            public void mouseExited(java.awt.event.MouseEvent evt) { logsBtn.setBackground(SIDEBAR_COLOR); }
-        });
-        logsBtn.addActionListener(e -> ((CardLayout)contentPanel.getLayout()).show(contentPanel, "LOGS"));
-        sidebar.add(logsBtn);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
-
-        JButton profileBtn = new JButton("👤 My Profile");
-        profileBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        profileBtn.setMaximumSize(new Dimension(180, 40));
-        profileBtn.setBackground(SIDEBAR_COLOR);
-        profileBtn.setForeground(Color.WHITE);
-        profileBtn.setFocusPainted(false);
-        profileBtn.setBorderPainted(false);
-        profileBtn.setFont(REGULAR_FONT);
-        profileBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        profileBtn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) { profileBtn.setBackground(new Color(44, 62, 80)); }
-            public void mouseExited(java.awt.event.MouseEvent evt) { profileBtn.setBackground(SIDEBAR_COLOR); }
-        });
-        profileBtn.addActionListener(e -> ((CardLayout)contentPanel.getLayout()).show(contentPanel, "PROFILE"));
-        sidebar.add(profileBtn);
-        sidebar.add(Box.createRigidArea(new Dimension(0, 10)));
+        // Role label similar to resident
+        JLabel roleLabel = new JLabel("STAFF");
+        roleLabel.setForeground(new Color(52, 152, 219));
+        roleLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        roleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sidebar.add(roleLabel);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 40)));
 
         sidebar.add(Box.createVerticalGlue());
 
@@ -805,14 +810,48 @@ public class CompoundManagementGUI extends JFrame {
             String serviceType = typeBox.getSelectedItem().equals("Other") ? otherTypeF.getText() : (String) typeBox.getSelectedItem();
             String date = dateEditor.getFormat().format((Date) dateSpinner.getValue());
             request req = new request(r, serviceType, detailsF.getText());
+            // add to shared requests so staff can see and respond
+            sharedRequests.add(req);
+            requestOwners.put(req, r);
+            requestStatuses.put(req, "Pending");
+            requestServices.put(req, serviceType);
+            requestDetails.put(req, detailsF.getText());
             System.out.println("Service: " + serviceType);
             System.out.println("Preferred Date: " + date);
             req.ShowTicket();
             signUpSystem.saveUsers();
+            // refresh staff request panels if open
+            runRefreshers("REQUESTS");
+            // refresh resident service view
+            runRefreshers("SERVICE");
         }));
 
         panel.add(backPanel, BorderLayout.NORTH);
         panel.add(mainPanel, BorderLayout.CENTER);
+
+        // My Requests list for this resident
+        DefaultListModel<String> myReqModel = new DefaultListModel<>();
+        JList<String> myReqList = new JList<>(myReqModel);
+        myReqList.setVisibleRowCount(6);
+        myReqList.setFixedCellWidth(360);
+        JPanel myReqPanel = new JPanel(new BorderLayout());
+        myReqPanel.setBorder(BorderFactory.createTitledBorder("My Requests (status shown)"));
+        myReqPanel.add(new JScrollPane(myReqList), BorderLayout.CENTER);
+        mainPanel.add(myReqPanel, BorderLayout.EAST);
+
+        Runnable refreshMyRequests = () -> {
+            myReqModel.clear();
+            for (request rq : sharedRequests) {
+                Resident owner = requestOwners.get(rq);
+                if (owner != null && owner.getUsername().equals(r.getUsername())) {
+                    String status = requestStatuses.getOrDefault(rq, "Pending");
+                    String svc = requestServices.getOrDefault(rq, "");
+                    myReqModel.addElement(svc + " — " + status);
+                }
+            }
+        };
+        registerRefresher("SERVICE", refreshMyRequests);
+        refreshMyRequests.run();
 
         backBtn.addActionListener(e -> {
             JPanel parent = (JPanel) SwingUtilities.getAncestorOfClass(JPanel.class, panel);
@@ -1304,29 +1343,44 @@ public class CompoundManagementGUI extends JFrame {
 
         Runnable loadRequests = () -> {
             requestsListPanel.removeAll();
-            for (person p : signUpSystem.getUsers()) {
-                if (p instanceof Resident) {
-                    JButton reqBtn = new JButton("Request from " + p.getName());
-                    reqBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
-                    reqBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
-                    styleButton(reqBtn, new Color(155, 89, 182));
+            for (request rq : sharedRequests) {
+                Resident owner = requestOwners.get(rq);
+                String status = requestStatuses.getOrDefault(rq, "Pending");
+                String svc = requestServices.getOrDefault(rq, "");
+                String label = "[" + status + "] " + (owner != null ? owner.getName() : "Unknown") + " — " + svc;
+                JButton reqBtn = new JButton(label);
+                reqBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+                reqBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+                styleButton(reqBtn, new Color(155, 89, 182));
 
                     reqBtn.addActionListener(e -> {
-                        detailArea.setText("Resident: " + p.getName() + "\n" +
-                                "Phone: " + p.getPhonenumber() + "\n" +
-                                "Email: " + p.getEmail() + "\n\n" +
-                                "Contact this resident to discuss the service request.");
-                    });
+                    String ownerInfo = owner != null ? ("Resident: " + owner.getName() + "\nPhone: " + owner.getPhonenumber() + "\nEmail: " + owner.getEmail() + "\n\n") : "Resident info unavailable\n\n";
+                    String det = requestDetails.getOrDefault(rq, "");
+                    detailArea.setText(ownerInfo + "Service: " + svc + "\nDetails: " + det + "\n\nStatus: " + status);
+                    // store selected in detail area client property
+                    detailArea.putClientProperty("selectedRequest", rq);
+                });
 
-                    requestsListPanel.add(reqBtn);
-                    requestsListPanel.add(Box.createVerticalStrut(5));
-                }
+                requestsListPanel.add(reqBtn);
+                requestsListPanel.add(Box.createVerticalStrut(5));
             }
             requestsListPanel.revalidate();
             requestsListPanel.repaint();
         };
 
-        respondBtn.addActionListener(e -> JOptionPane.showMessageDialog(panel, "Request marked as completed."));
+        respondBtn.addActionListener(e -> {
+            Object obj = detailArea.getClientProperty("selectedRequest");
+            if (obj instanceof request) {
+                request sel = (request) obj;
+                requestStatuses.put(sel, "Completed");
+                JOptionPane.showMessageDialog(panel, "Request marked as completed.");
+                signUpSystem.saveUsers();
+                loadRequests.run();
+                runRefreshers("SERVICE");
+            } else {
+                JOptionPane.showMessageDialog(panel, "Select a request first from the list.");
+            }
+        });
 
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBackground(BG_COLOR);
@@ -1344,6 +1398,8 @@ public class CompoundManagementGUI extends JFrame {
         panel.add(detailPanel, BorderLayout.CENTER);
 
         loadRequests.run();
+        // register refresher so new resident requests update this list
+        registerRefresher("REQUESTS", loadRequests);
         return panel;
     }
 

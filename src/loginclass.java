@@ -1,5 +1,4 @@
 
-import java.util.Scanner;
 
 public class loginclass {
 
@@ -60,44 +59,9 @@ public class loginclass {
 
         System.out.println("Login successful! Welcome, " + inputUser + ".");
 
-        // After successful login, ask the user if they want to update information
-        offerUpdateInfo();
-
         return true;
+        
     }
-
-    // Ask user if they want to update personal info
-    public void offerUpdateInfo() {
-
-        // No person object attached
-        if (this.person == null) {
-            System.out.println("No personal profile found to update.");
-            return;
-        }
-
-        Scanner input = new Scanner(System.in);
-
-        System.out.println("Do you want to update your information? (yes/no)");
-        String answer = input.nextLine();
-
-        if (answer.equalsIgnoreCase("yes")) {
-
-            System.out.print("Enter new address: ");
-            String newAddress = input.nextLine();
-
-            System.out.print("Enter new phone number: ");
-            String newPhone = input.nextLine();
-
-            System.out.print("Enter new email: ");
-            String newEmail = input.nextLine();
-
-
-
-        } else {
-            System.out.println("No changes were made.");
-        }
-    }
-
     @Override
     public String toString() {
         return "loginclass [username=" + username + "]";
