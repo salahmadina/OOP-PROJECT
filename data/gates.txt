@@ -1,0 +1,34 @@
+# Gate Data File
+# Format: gateId|location|isOpen
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|true
+1|Main Entrance|true
+2|Back Entrance|false
+1|Main Entrance|true
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|true
+1|Main Entrance|false
+2|Back Entrance|false

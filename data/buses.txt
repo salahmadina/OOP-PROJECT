@@ -1,0 +1,2 @@
+# Bus Schedule Data File
+# Format: busId|stops|trips

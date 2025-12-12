@@ -1,0 +1,6 @@
+# Gate Access Logs
+# Format: timestamp/userId/action
+User 1000515540 entered.
+User 1000515540 entered.
+User 1000515540 entered.
+User 1000515540 entered.

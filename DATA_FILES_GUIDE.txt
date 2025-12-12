@@ -1,0 +1,160 @@
+================================================================================
+DATA FILES LOCATION & FORMAT GUIDE
+================================================================================
+
+PROJECT ROOT
+C:\Users\SALAH\Downloads\Smartcompound3
+
+DATA DIRECTORY
+All data files are saved in:
+C:\Users\SALAH\Downloads\Smartcompound3\data
+
+This folder is created automatically the first time you run the program.
+
+================================================================================
+DATA FILES & THEIR FORMATS
+================================================================================
+
+1. data/users.txt
+================================================================================
+Purpose: Stores all registered users (residents and staff)
+
+Format (pipe-separated |):
+password|username|name|age|nationalID|phonenumber|email|role|dependants|type|apartmentNumber|buildingNumber
+
+================================================================================
+
+2. data/gates.txt
+================================================================================
+Purpose: Stores gate information (entrance/exit points)
+
+Format:
+gateId|location|isOpen
+
+================================================================================
+
+3. data/qrcodes.txt
+================================================================================
+Purpose: Stores generated QR codes for gate access
+
+Format:
+userId|code
+
+================================================================================
+
+4. data/logs.txt
+================================================================================
+Purpose: Stores gate entry/exit logs
+
+Format:
+log entry (user ID + action timestamp)
+
+================================================================================
+
+5. data/buses.txt
+================================================================================
+Purpose: Marks that the bus schedule is initialized
+
+Format:
+# Bus Schedule Data File
+# Format: busId|stops|trips
+
+Note: Bus schedule is primarily managed in memory in BusSchedules class.
+
+================================================================================
+
+6. data/reports.txt
+================================================================================
+Purpose: Stores issue reports filed by residents
+
+Format:
+reportId|citizenName|type|description|dateTime|status
+
+================================================================================
+HOW TO VIEW & EDIT FILES
+================================================================================
+
+In Windows Explorer:
+1. Navigate to: C:\Users\SALAH\Downloads\Smartcompound3\data
+2. Right-click any .txt file → Open With → Notepad or VS Code
+
+In VS Code:
+1. Open the workspace folder
+2. Expand the data folder in the Explorer sidebar
+3. Click any .txt file to view/edit
+
+Command Line (PowerShell):
+# View users file
+Get-Content "C:\Users\SALAH\Downloads\Smartcompound3\data\users.txt"
+
+# View gates file
+Get-Content "C:\Users\SALAH\Downloads\Smartcompound3\data\gates.txt"
+
+# View all files in data directory
+Get-ChildItem "C:\Users\SALAH\Downloads\Smartcompound3\data"
+
+================================================================================
+WHEN FILES ARE CREATED/UPDATED
+================================================================================
+
+Event                          | Files Updated
+-------------------------------|------------------
+Program starts                 | All files loaded (if exist)
+User signs up                  | users.txt
+Bus booking                    | buses.txt
+QR code generated              | qrcodes.txt
+Gate access                    | logs.txt
+Report filed                   | reports.txt
+Program exits                  | All files saved
+
+================================================================================
+DATA PERSISTENCE FLOW
+================================================================================
+
+Program Start
+    ↓
+Load from files (DataService)
+    ↓
+Create/Update data in memory
+    ↓
+Save to files (on each action or exit)
+    ↓
+Program Exit
+
+================================================================================
+IMPORTANT NOTES
+================================================================================
+
+✓ All text files are human-readable
+  You can open and edit them with any text editor
+
+✓ Pipe separator (|)
+  Don't add or remove pipes accidentally when editing
+
+✓ Comments
+  Lines starting with # are ignored as comments
+
+✓ Empty lines
+  Ignored by the loader
+
+✓ Data Directory
+  If deleted, it will be recreated on next program run
+
+✓ File Format
+  Keep the exact format to avoid parsing errors
+
+================================================================================
+COMPLETE DATA/ DIRECTORY STRUCTURE
+================================================================================
+
+data/
+├── users.txt        (Registered users)
+├── gates.txt        (Gate information)
+├── qrcodes.txt      (QR codes for access)
+├── logs.txt         (Access logs)
+├── buses.txt        (Bus schedule marker)
+└── reports.txt      (Issue reports)
+
+All files are created automatically when the program runs!
+
+================================================================================
