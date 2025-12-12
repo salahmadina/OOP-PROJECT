@@ -1130,6 +1130,15 @@ public class CompoundManagementGUI extends JFrame {
     private JPanel createResidentListPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        panel.setBackground(BG_COLOR);
+
+        // Back Button
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel.setBackground(BG_COLOR);
+        JButton backBtn = new JButton("← Back to Menu");
+        styleButton(backBtn, SIDEBAR_COLOR);
+        topPanel.add(backBtn);
+        panel.add(topPanel, BorderLayout.NORTH);
 
         // Using JTable for better visualization
         String[] columns = {"Name", "Username", "Email", "Phone"};
@@ -1182,6 +1191,11 @@ public class CompoundManagementGUI extends JFrame {
         });
 
         loadData.run(); // Initial load
+        backBtn.addActionListener(e -> {
+            JPanel parent = (JPanel) SwingUtilities.getAncestorOfClass(JPanel.class, panel);
+            CardLayout cl = (CardLayout) parent.getLayout();
+            cl.show(parent, "MAIN");
+        });
         return panel;
     }
 
@@ -1190,6 +1204,14 @@ public class CompoundManagementGUI extends JFrame {
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
+        // Back Button
+        JPanel topBack = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topBack.setBackground(BG_COLOR);
+        JButton backBtn = new JButton("← Back to Menu");
+        styleButton(backBtn, SIDEBAR_COLOR);
+        topBack.add(backBtn);
+        panel.add(topBack, BorderLayout.NORTH);
+
         // Reports List Panel (clickable)
         JPanel reportsListPanel = new JPanel();
         reportsListPanel.setLayout(new BoxLayout(reportsListPanel, BoxLayout.Y_AXIS));
@@ -1197,7 +1219,15 @@ public class CompoundManagementGUI extends JFrame {
         reportsListPanel.setBorder(BorderFactory.createTitledBorder("Your Assigned Reports"));
         
         JScrollPane reportsScroll = new JScrollPane(reportsListPanel);
-        reportsScroll.setPreferredSize(new Dimension(300, 300));
+        reportsScroll.setPreferredSize(new Dimension(300, 200));
+
+        // Service Requests Panel to show resident requests as well
+        JPanel requestsListPanel = new JPanel();
+        requestsListPanel.setLayout(new BoxLayout(requestsListPanel, BoxLayout.Y_AXIS));
+        requestsListPanel.setBackground(BG_COLOR);
+        requestsListPanel.setBorder(BorderFactory.createTitledBorder("Service Requests"));
+        JScrollPane requestsScroll = new JScrollPane(requestsListPanel);
+        requestsScroll.setPreferredSize(new Dimension(300, 200));
 
         // Detail Panel
         JPanel detailPanel = new JPanel(new BorderLayout(10, 10));
@@ -1253,6 +1283,33 @@ public class CompoundManagementGUI extends JFrame {
             reportsListPanel.repaint();
         };
 
+        // Load service requests into the requests list (for Staff view)
+        Runnable loadRequests = () -> {
+            requestsListPanel.removeAll();
+            for (request rq : sharedRequests) {
+                Resident owner = requestOwners.get(rq);
+                String status = requestStatuses.getOrDefault(rq, "Pending");
+                String svc = requestServices.getOrDefault(rq, "");
+                JButton reqBtn = new JButton("[" + status + "] " + (owner != null ? owner.getName() : "Unknown") + " — " + svc);
+                reqBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+                reqBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+                styleButton(reqBtn, new Color(155, 89, 182));
+
+                reqBtn.addActionListener(e -> {
+                    String ownerInfo = owner != null ? ("Resident: " + owner.getName() + "\nPhone: " + owner.getPhonenumber() + "\nEmail: " + owner.getEmail() + "\n\n") : "Resident info unavailable\n\n";
+                    String det = requestDetails.getOrDefault(rq, "");
+                    detailArea.setText(ownerInfo + "Service: " + svc + "\nDetails: " + det + "\n\nStatus: " + status);
+                    detailArea.putClientProperty("selectedRequest", rq);
+                    selectedReport[0] = null;
+                });
+
+                requestsListPanel.add(reqBtn);
+                requestsListPanel.add(Box.createVerticalStrut(5));
+            }
+            requestsListPanel.revalidate();
+            requestsListPanel.repaint();
+        };
+
         updateBtn.addActionListener(e -> {
             if (selectedReport[0] != null) {
                 String newStatus = (String) statusBox.getSelectedItem();
@@ -1265,22 +1322,35 @@ public class CompoundManagementGUI extends JFrame {
             }
         });
 
-        JPanel leftPanel = new JPanel(new BorderLayout());
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         leftPanel.setBackground(BG_COLOR);
-        leftPanel.add(reportsScroll, BorderLayout.CENTER);
+        leftPanel.add(reportsScroll);
+        leftPanel.add(Box.createVerticalStrut(10));
+        leftPanel.add(requestsScroll);
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.setBackground(BG_COLOR);
         JButton refreshBtn = new JButton("Refresh");
         styleButton(refreshBtn, ACCENT_COLOR);
-        refreshBtn.addActionListener(e -> loadReports.run());
+        refreshBtn.addActionListener(e -> { loadReports.run(); loadRequests.run(); });
         topPanel.add(refreshBtn);
 
-        panel.add(topPanel, BorderLayout.NORTH);
+        panel.add(topPanel, BorderLayout.CENTER);
         panel.add(leftPanel, BorderLayout.WEST);
         panel.add(detailPanel, BorderLayout.CENTER);
 
+        // Wire up back button
+        backBtn.addActionListener(e -> {
+            JPanel parent = (JPanel) SwingUtilities.getAncestorOfClass(JPanel.class, panel);
+            CardLayout cl = (CardLayout) parent.getLayout();
+            cl.show(parent, "MAIN");
+        });
+
         loadReports.run();
+        loadRequests.run();
+        // Keep requests in sync with other views
+        registerRefresher("REQUESTS", loadRequests);
         return panel;
     }
 
@@ -1288,21 +1358,30 @@ public class CompoundManagementGUI extends JFrame {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        // Back Button
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel.setBackground(BG_COLOR);
+        JButton backBtn = new JButton("← Back to Menu");
+        styleButton(backBtn, SIDEBAR_COLOR);
+        topPanel.add(backBtn);
         
         JTextArea log = createConsoleArea();
         log.setPreferredSize(new Dimension(600, 400));
         
         JButton refresh = new JButton("Refresh Logs");
         styleButton(refresh, ACCENT_COLOR);
-
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topPanel.setBackground(BG_COLOR);
         topPanel.add(refresh);
 
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(new JScrollPane(log), BorderLayout.CENTER);
 
         refresh.addActionListener(e -> captureOutput(log, () -> qrGateSystem.showLogs()));
+        backBtn.addActionListener(e -> {
+            JPanel parent = (JPanel) SwingUtilities.getAncestorOfClass(JPanel.class, panel);
+            CardLayout cl = (CardLayout) parent.getLayout();
+            cl.show(parent, "MAIN");
+        });
         return panel;
     }
 
@@ -1388,12 +1467,20 @@ public class CompoundManagementGUI extends JFrame {
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.setBackground(BG_COLOR);
+        JButton backBtn = new JButton("← Back to Menu");
+        styleButton(backBtn, SIDEBAR_COLOR);
+        topPanel.add(backBtn);
         JButton refreshBtn = new JButton("Refresh");
         styleButton(refreshBtn, ACCENT_COLOR);
         refreshBtn.addActionListener(e -> loadRequests.run());
         topPanel.add(refreshBtn);
 
         panel.add(topPanel, BorderLayout.NORTH);
+        backBtn.addActionListener(e -> {
+            JPanel parent = (JPanel) SwingUtilities.getAncestorOfClass(JPanel.class, panel);
+            CardLayout cl = (CardLayout) parent.getLayout();
+            cl.show(parent, "MAIN");
+        });
         panel.add(leftPanel, BorderLayout.WEST);
         panel.add(detailPanel, BorderLayout.CENTER);
 
