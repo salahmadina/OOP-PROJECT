@@ -1,3 +1,2 @@
-000|salah|salah hassan salah|22|1234567899876543|1000515540|salahmadina@gmail.com|Resident|f|RESIDENT|3|22
-000|mostafa|mostafa|23|1234567899876544|1000515544|mostafa@gmail.com|Staff|f|STAFF|0|0
-we|we|we|33|1111111111111111|1000000000|we@|Staff|None|STAFF|0|0
+000|salma|salma hakim|20|1234567899876544|1022374454|salma@gmail.com|Staff|zein|STAFF|0|0
+000|nour|nour|20|1234567899876546|1095566625|nour@gmail.com|Resident|None|RESIDENT|7|2

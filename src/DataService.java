@@ -17,6 +17,7 @@ public class DataService {
     private static final String QR_CODES_FILE = DATA_DIR + "/qrcodes.txt";
     private static final String LOGS_FILE = DATA_DIR + "/logs.txt";
     private static final String REPORTS_FILE = DATA_DIR + "/reports.txt";
+     private static final String REQUEST_FILE = DATA_DIR + "/request.txt";
 
     // Static initializer to create data directory if it doesn't exist
     static {
@@ -84,7 +85,7 @@ public class DataService {
                 String dependants = parts[8];
                 String type = parts[9];
                 
-                if ("RESIDENT".equals(type) && parts.length >= 12) {
+                if ("RESIDENT".equals(type) && parts.length == 12) {
                     int apt = Integer.parseInt(parts[10]);
                     int building = Integer.parseInt(parts[11]);
                     users.add(new Resident(password, username, name, age, nationalID, phone, email, role, dependants, apt, building));
@@ -284,13 +285,13 @@ public class DataService {
         try (FileWriter fw = new FileWriter(REPORTS_FILE)) {
             fw.write("# Reports Data File\n");
             fw.write("# Format: reportId|citizenName|type|description|dateTime|status\n");
-            for (Staff s : staffMembers) {
+           for (Staff s : staffMembers) {
                 for (Report r : s.getAssignedReports()) {
                     fw.write(r.getReportId() + "|" + r.getCitizenName() + "|" + r.getType() + "|" 
                         + r.getDescription() + "|" + r.getDateTime() + "|" + r.getStatus() + "\n");
                 }
-            }
-            System.out.println("[DataService] Reports saved to " + REPORTS_FILE);
+            }       
+                 System.out.println("[DataService] Reports saved to " + REPORTS_FILE);
         } catch (IOException e) {
             System.out.println("[DataService] Error saving reports: " + e.getMessage());
         }
