@@ -2,14 +2,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-/**
- * DataService: Helper class for reading and writing ArrayLists to TEXT files.
- * Each ArrayList is persisted to its own .txt file for data persistence across sessions.
- * Data files are stored in the 'data' folder relative to the project root.
- */
 public class DataService {
 
-    // File paths for data storage (text files in 'data' directory)
     private static final String DATA_DIR = "data";
     private static final String USERS_FILE = DATA_DIR + "/users.txt";
     private static final String BUSES_FILE = DATA_DIR + "/buses.txt";
@@ -19,18 +13,8 @@ public class DataService {
     private static final String REPORTS_FILE = DATA_DIR + "/reports.txt";
      private static final String REQUEST_FILE = DATA_DIR + "/request.txt";
 
-    // Static initializer to create data directory if it doesn't exist
-    static {
-        File dir = new File(DATA_DIR);
-        if (!dir.exists()) {
-            dir.mkdir();
-        }
-    }
+    
 
-    /**
-     * Save users list to TEXT file (from SignUp)
-     * Format: password|username|name|age|nationalID|phonenumber|email|role|dependants|type|apartmentNumber|buildingNumber
-     */
     public static void saveUsers(ArrayList<person> users) {
         try (FileWriter fw = new FileWriter(USERS_FILE)) {
             for (person p : users) {
@@ -39,13 +23,13 @@ public class DataService {
                     fw.write(r.getPassword() + "|" + r.getUsername() + "|" + r.getName() + "|" 
                         + r.getAge() + "|" + r.getNationalID() + "|" + r.getPhonenumber() + "|" 
                         + r.getEmail() + "|" + r.getRole() + "|" + r.getDependants() + "|"
-                        + "RESIDENT" + "|" + r.getApartmentNumber2() + "|" + r.getbuildingNumber() + "\n");
+                         + r.getApartmentNumber2() + "|" + r.getbuildingNumber() + "\n");
                 } else if (p instanceof Staff) {
                     Staff s = (Staff) p;
                     fw.write(s.getPassword() + "|" + s.getUsername() + "|" + s.getName() + "|" 
                         + s.getAge() + "|" + s.getNationalID() + "|" + s.getPhonenumber() + "|" 
                         + s.getEmail() + "|" + s.getRole() + "|" + s.getDependants() + "|"
-                        + "STAFF|0|0\n");
+                        + "0|0\n");
                 }
             }
             System.out.println("[DataService] Users saved to " + USERS_FILE);
@@ -54,9 +38,7 @@ public class DataService {
         }
     }
 
-    /**
-     * Load users list from TEXT file (for SignUp)
-     */
+   
     public static ArrayList<person> loadUsers() {
         ArrayList<person> users = new ArrayList<>();
         File file = new File(USERS_FILE);
@@ -72,7 +54,7 @@ public class DataService {
                 if (line.isEmpty()) continue;
                 
                 String[] parts = line.split("\\|");
-                if (parts.length < 9) continue;
+                if (parts.length < 8) continue;
                 
                 String password = parts[0];
                 String username = parts[1];
@@ -83,13 +65,12 @@ public class DataService {
                 String email = parts[6];
                 String role = parts[7];
                 String dependants = parts[8];
-                String type = parts[9];
                 
-                if ("RESIDENT".equals(type) && parts.length == 12) {
-                    int apt = Integer.parseInt(parts[10]);
-                    int building = Integer.parseInt(parts[11]);
+                if ("Resident".equals(role) && parts.length == 11) {
+                    int apt = Integer.parseInt(parts[9]);
+                    int building = Integer.parseInt(parts[10]);
                     users.add(new Resident(password, username, name, age, nationalID, phone, email, role, dependants, apt, building));
-                } else if ("STAFF".equals(type)) {
+                } else if ("Staff".equals(role)) {
                     users.add(new Staff(password, username, name, age, nationalID, phone, email, role, dependants));
                 }
             }

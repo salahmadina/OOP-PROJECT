@@ -84,3 +84,9 @@
 2|Back Entrance|false
 1|Main Entrance|false
 2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
+1|Main Entrance|false
+2|Back Entrance|false
