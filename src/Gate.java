@@ -1,9 +1,4 @@
-
-
-import java.io.Serializable;
-
-public class Gate implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Gate{
 
     private int gateId;
     private String location;
@@ -16,7 +11,7 @@ public class Gate implements Serializable {
     }
 
     public boolean scanQRCode(QRCode qr) {
-        if (qr.validate()) {   // Correct method name
+        if (qr.validate()) {   
             openGate();
             return true;
         } else {

@@ -1,14 +1,11 @@
 
-
 import java.time.LocalDateTime;
 import java.util.UUID;
-import java.io.Serializable;
 
-public class Report implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Report {
 
     private String reportId;
-    private String resdientnName;
+    private String resdientName;
     private String type;
     private String description;
     private LocalDateTime dateTime;
@@ -16,7 +13,7 @@ public class Report implements Serializable {
 
     public Report(person Resdient, String type, String description) {
         this.reportId = UUID.randomUUID().toString();
-        this.resdientnName = Resdient.getName();
+        this.resdientName = Resdient.getName();
         this.type = type;
         this.description = description;
         this.dateTime = LocalDateTime.now();
@@ -24,7 +21,7 @@ public class Report implements Serializable {
     }
 
     public String getReportId() { return reportId; }
-    public String getCitizenName() { return resdientnName; }
+    public String getCitizenName() { return resdientName; }
     public String getType() { return type; }
     public String getDescription() { return description; }
     public LocalDateTime getDateTime() { return dateTime; }
@@ -39,7 +36,7 @@ public class Report implements Serializable {
     public String toString() {
         return "Report{" +
                 "reportId='" + reportId + '\'' +
-                ", resdientnName='" + resdientnName + '\'' +
+                ", resdientName='" + resdientName + '\'' +
                 ", type='" + type + '\'' +
                 ", description='" + description + '\'' +
                 ", dateTime=" + dateTime +

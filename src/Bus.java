@@ -1,44 +1,21 @@
 
 
 import java.util.ArrayList;
-import java.io.Serializable;
 
-public class Bus implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Bus  {
 
-    private String BusId;
+    private String busId;
     private static int BusCapacity=45;
     private static int BusAvaliableSeats=45;
     public static double distanceKm = 10.0;
     public static double priceperKm = 2.5;
+    boolean found = false;
 
-
-    public String getBusId() {
-        return busId;
-    }
-
-    public String getBusNum() {
-        return BusId;
-    }
-    public static int getBusCapacity() {
-        return BusCapacity;
-    }
-
-    public static void setBusCapacity(int busCapacity) {
-        BusCapacity = busCapacity;
-    }
-
-    public static int getBusAvaliableSeats() {
-        return BusAvaliableSeats;
-    }
-
-    public void setBusAvaliableSeats(int busAvaliableSeats) {
-        BusAvaliableSeats = busAvaliableSeats;
-    }
-
-    private String busId;
+    
     private ArrayList<BusTrips> trips;
     private ArrayList<String> stops;
+
+
 
     public Bus(String busId) {
         this.busId = busId;
@@ -64,7 +41,6 @@ public class Bus implements Serializable {
             System.out.println("This bus doesn't pass the destination");
 
         }
-        boolean found = false;
 
         for (BusTrips t : trips) {
             if (t.getRoute() != null && t.getRoute().equalsIgnoreCase(destination)) {
@@ -73,9 +49,6 @@ public class Bus implements Serializable {
             }
         }
 
-        if (!found) {
-            System.out.println("Bus " + busId + " passes through " + destination);
-        }
     }
     public double getDistanceKm() {
         return distanceKm;
@@ -101,6 +74,30 @@ public class Bus implements Serializable {
         System.out.println("Booking successful! Seats left: " + BusAvaliableSeats);
         return true;
     }
+    
+    public String getBusId() {
+        return busId;
+    }
+
+    public String getBusNum() {
+        return busId;
+    }
+    public static int getBusCapacity() {
+        return BusCapacity;
+    }
+
+    public static void setBusCapacity(int busCapacity) {
+        BusCapacity = busCapacity;
+    }
+
+    public static int getBusAvaliableSeats() {
+        return BusAvaliableSeats;
+    }
+
+    public void setBusAvaliableSeats(int busAvaliableSeats) {
+        BusAvaliableSeats = busAvaliableSeats;
+    }
+
 
 }
 

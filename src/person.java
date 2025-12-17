@@ -1,19 +1,12 @@
 
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
-import java.io.Serializable;
-
-
-public abstract class person implements Serializable {
-    private static final long serialVersionUID = 1L;
+public abstract class person {
 
     protected String name;
     protected int age;
     private int digits;
     private String nationalID;
-    private int phonenumber;
+    private String phonenumber;
     private String email;
     private String role;
     private String dependants;
@@ -31,7 +24,7 @@ public abstract class person implements Serializable {
         this.age = age;
         this.nationalID = nationalID;
         this.digits = nationalID.length();
-        this.phonenumber = Integer.parseInt(phone);
+        this.phonenumber = phone;
         this.email = email;
         this.role = role;
         this.dependants = dependants;
@@ -80,12 +73,12 @@ public abstract class person implements Serializable {
         this.digits = nationalID.length();
     }
 
-    public int getPhonenumber() {
+    public String getPhonenumber() {
         return phonenumber;
     }
 
     public void setPhonenumber(String phone) {
-        this.phonenumber = Integer.parseInt(phone);
+        this.phonenumber = phone;
     }
 
     public String getEmail() {

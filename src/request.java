@@ -1,10 +1,4 @@
-
-
-import java.io.Serializable;
-
-public class request implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class request {
     private Resident resident;
     private String service;
     private String details;

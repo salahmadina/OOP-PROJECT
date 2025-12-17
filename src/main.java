@@ -226,7 +226,7 @@ public class main {
     private static void handleGateAccess(Resident resident) {
         System.out.println("\n--- Gate Access Control ---");
         // Using phone number as a unique int ID for QR generation
-        int userId = resident.getPhonenumber();
+        String userId = resident.getPhonenumber();
 
         System.out.println("1. Generate Entry QR Code");
         System.out.println("2. Go Back");

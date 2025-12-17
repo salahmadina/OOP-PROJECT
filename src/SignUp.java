@@ -45,7 +45,7 @@ public class SignUp {
         System.out.print("Choose: ");
         String choice = scanner.nextLine();
 
-        // Basic info
+        
         System.out.print("Enter Name: ");
         String name = scanner.nextLine();
 

@@ -1,20 +1,15 @@
-
-
 public class loginclass {
 
     private String username;
     private String password;
-    private person person; 
+    private person person;
 
-    
     public loginclass(person person) {
         this.person = person;
         this.username = person.getUsername();
         this.password = person.getPassword();
     }
 
-    
-    
     public person getPerson() {
         return person;
     }
@@ -39,7 +34,6 @@ public class loginclass {
         this.password = password;
     }
 
-    
     public boolean validateLogin(String inputUser, String inputPass) {
 
         if (!inputUser.equals(this.username)) {
@@ -55,8 +49,9 @@ public class loginclass {
         System.out.println("Login successful! Welcome, " + inputUser + ".");
 
         return true;
-        
+
     }
+
     @Override
     public String toString() {
         return "loginclass [username=" + username + "]";

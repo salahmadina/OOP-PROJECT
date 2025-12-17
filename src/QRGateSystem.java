@@ -1,7 +1,4 @@
-
-
 import java.util.ArrayList;
-
 public class QRGateSystem {
 
     private ArrayList<Gate> gates = new ArrayList<>();
@@ -9,7 +6,6 @@ public class QRGateSystem {
     private ArrayList<String> logs = new ArrayList<>();
 
     public QRGateSystem() {
-        // Load data from files on initialization
         this.gates = DataService.loadGates();
         this.qrCodes = DataService.loadQRCodes();
         this.logs = DataService.loadLogs();
@@ -25,28 +21,25 @@ public class QRGateSystem {
         gates.add(gate);
     }
 
-    public QRCode assignQRCodeToUser(int userId) {
+    public QRCode assignQRCodeToUser(String userId) {
         QRCode qr = new QRCode(userId);
         qrCodes.add(qr);
         return qr;
     }
 
-    public void logEntry(int userId) {
+    public void logEntry(String userId) {
         logs.add("User " + userId + " entered.");
-        saveAllData(); // Save after logging
+        saveAllData(); 
     }
 
-    public void logExit(int userId) {
+    public void logExit(String userId) {
         logs.add("User " + userId + " exited.");
-        saveAllData(); // Save after logging
+        saveAllData(); 
     }
 
     public void showLogs() {
         System.out.println("\n===== LOGS =====");
         for (String log : logs) System.out.println(log);
-    }
-    public ArrayList<String> getLogs() {
-        return logs;
     }
 
 }

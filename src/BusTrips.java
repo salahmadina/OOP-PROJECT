@@ -1,9 +1,4 @@
-
-
-import java.io.Serializable;
-
-public class BusTrips implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class BusTrips{
 
     private String route;
     private String departureTime;

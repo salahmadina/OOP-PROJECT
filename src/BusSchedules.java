@@ -1,5 +1,3 @@
-
-
 import java.util.ArrayList;
 
 public class BusSchedules {
@@ -64,12 +62,10 @@ public class BusSchedules {
     private ArrayList<Bus> buses = new ArrayList<>();
 
     public BusSchedules() {
-        // Try to load buses from file, if not available use default
         ArrayList<Bus> loaded = DataService.loadBuses();
         if (loaded != null && !loaded.isEmpty()) {
             this.buses = loaded;
         } else {
-            // Use default schedule if no saved data
             initializeDefaultBuses();
         }
     }

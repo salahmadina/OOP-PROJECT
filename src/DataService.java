@@ -11,7 +11,6 @@ public class DataService {
     private static final String QR_CODES_FILE = DATA_DIR + "/qrcodes.txt";
     private static final String LOGS_FILE = DATA_DIR + "/logs.txt";
     private static final String REPORTS_FILE = DATA_DIR + "/reports.txt";
-     private static final String REQUEST_FILE = DATA_DIR + "/request.txt";
 
     
 
@@ -177,7 +176,7 @@ public class DataService {
                 String[] parts = line.split("\\|");
                 if (parts.length < 2) continue;
                 
-                int userId = Integer.parseInt(parts[0]);
+                String userId = parts[0];
                 String code = parts[1];
                 
                 QRCode qr = new QRCode(userId);

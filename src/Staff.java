@@ -12,7 +12,7 @@ public class Staff extends person implements info
                  String role, String dependants) {
 
         super(password, username, name, age, nationalID, phone, email, role, dependants);
-        this.assignedReports = new ArrayList<>(); // initialize to prevent null pointer
+        this.assignedReports = new ArrayList<>();
     }
 
     public ArrayList<Report> getAssignedReports() {
@@ -75,7 +75,7 @@ public class Staff extends person implements info
 
         System.out.print("Enter the number of the resident to remove: ");
         int choice = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        scanner.nextLine();
 
         if (choice < 1 || choice > residents.size()) {
             System.out.println("Invalid choice!");
