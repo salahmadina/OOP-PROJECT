@@ -1,5 +1,5 @@
 
-public class Resident extends person {
+public class Resident extends person implements info {
     private static final long serialVersionUID = 1L;
 
     private String dependants;
@@ -33,5 +33,17 @@ public class Resident extends person {
         this.dependants = dependants;
     }
 
+    @Override
+    public void displayInfo() {
+        System.out.println("----- Resident Info -----");
+        System.out.println("Name: " + getName());
+        System.out.println("Age: " + getAge());
+        System.out.println("National ID: " + getNationalID());
+        System.out.println("Phone: " + getPhonenumber());
+        System.out.println("Email: " + getEmail());
+        System.out.println("Role: " + getRole());
+        System.out.println("Dependants: " + getDependants());
+        System.out.println("----------------------");
+    }
 }
 

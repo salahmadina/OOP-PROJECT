@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.io.Serializable;
 
-public class Staff extends person {
-    private static final long serialVersionUID = 1L;
+public class Staff extends person implements info 
+{
+   
 
     private ArrayList<Report> assignedReports;
 
@@ -86,5 +86,18 @@ public class Staff extends person {
         users.remove(toRemove);
 
         System.out.println("Resident " + toRemove.getUsername() + " removed successfully!");
+    }
+
+    @Override
+    public void displayInfo() {
+        System.out.println("----- Staff Info -----");
+        System.out.println("Name: " + getName());
+        System.out.println("Age: " + getAge());
+        System.out.println("National ID: " + getNationalID());
+        System.out.println("Phone: " + getPhonenumber());
+        System.out.println("Email: " + getEmail());
+        System.out.println("Role: " + getRole());
+        System.out.println("Dependants: " + getDependants());
+        System.out.println("----------------------");
     }
 }
