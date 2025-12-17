@@ -82,13 +82,8 @@ public class DataService {
         return users;
     }
 
-    /**
-     * Save buses list to TEXT file (from BusSchedules)
-     * Format: busId|stop1,stop2,stop3|trip1(route-departure-arrival),trip2,...
-     */
     public static void saveBuses(ArrayList<Bus> buses) {
         try (FileWriter fw = new FileWriter(BUSES_FILE)) {
-            // Just save a marker that buses are initialized; actual bus data is managed in BusSchedules
             fw.write("# Bus Schedule Data File\n");
             fw.write("# Format: busId|stops|trips\n");
             System.out.println("[DataService] Buses state saved to " + BUSES_FILE);
@@ -97,11 +92,7 @@ public class DataService {
         }
     }
 
-    /**
-     * Load buses list from TEXT file (for BusSchedules)
-     */
     public static ArrayList<Bus> loadBuses() {
-        // Buses are managed internally in BusSchedules, return null to use defaults
         File file = new File(BUSES_FILE);
         if (file.exists()) {
             System.out.println("[DataService] Buses file found. Using existing configuration.");
@@ -110,10 +101,6 @@ public class DataService {
         return null;
     }
 
-    /**
-     * Save gates list to TEXT file (from QRGateSystem)
-     * Format: gateId|location|isOpen
-     */
     public static void saveGates(ArrayList<Gate> gates) {
         try (FileWriter fw = new FileWriter(GATES_FILE)) {
             fw.write("# Gate Data File\n");
@@ -127,9 +114,6 @@ public class DataService {
         }
     }
 
-    /**
-     * Load gates list from TEXT file (for QRGateSystem)
-     */
     public static ArrayList<Gate> loadGates() {
         ArrayList<Gate> gates = new ArrayList<>();
         File file = new File(GATES_FILE);
@@ -163,10 +147,6 @@ public class DataService {
         return gates;
     }
 
-    /**
-     * Save QR codes list to TEXT file (from QRGateSystem)
-     * Format: userId|code
-     */
     public static void saveQRCodes(ArrayList<QRCode> qrCodes) {
         try (FileWriter fw = new FileWriter(QR_CODES_FILE)) {
             fw.write("# QR Codes Data File\n");
@@ -180,9 +160,6 @@ public class DataService {
         }
     }
 
-    /**
-     * Load QR codes list from TEXT file (for QRGateSystem)
-     */
     public static ArrayList<QRCode> loadQRCodes() {
         ArrayList<QRCode> qrCodes = new ArrayList<>();
         File file = new File(QR_CODES_FILE);
@@ -204,7 +181,6 @@ public class DataService {
                 String code = parts[1];
                 
                 QRCode qr = new QRCode(userId);
-                // Note: code is overwritten in constructor, you may need to add setter
                 qrCodes.add(qr);
             }
             System.out.println("[DataService] QR Codes loaded from " + QR_CODES_FILE + " (" + qrCodes.size() + " codes)");
@@ -215,10 +191,6 @@ public class DataService {
         return qrCodes;
     }
 
-    /**
-     * Save logs list to TEXT file (from QRGateSystem)
-     * Format: one log entry per line
-     */
     public static void saveLogs(ArrayList<String> logs) {
         try (FileWriter fw = new FileWriter(LOGS_FILE)) {
             fw.write("# Gate Access Logs\n");
@@ -232,9 +204,6 @@ public class DataService {
         }
     }
 
-    /**
-     * Load logs list from TEXT file (for QRGateSystem)
-     */
     public static ArrayList<String> loadLogs() {
         ArrayList<String> logs = new ArrayList<>();
         File file = new File(LOGS_FILE);
@@ -258,10 +227,6 @@ public class DataService {
         return logs;
     }
 
-    /**
-     * Save all assigned reports to TEXT file (from Staff instances)
-     * Format: reportId|citizenName|type|description|dateTime|status
-     */
     public static void saveAllReports(ArrayList<Staff> staffMembers) {
         try (FileWriter fw = new FileWriter(REPORTS_FILE)) {
             fw.write("# Reports Data File\n");
@@ -278,11 +243,7 @@ public class DataService {
         }
     }
 
-    /**
-     * Load all reports from TEXT file
-     */
     public static ArrayList<Report> loadReports() {
-        // Note: Reports require a person object, so this needs manual reconstruction
         ArrayList<Report> reports = new ArrayList<>();
         File file = new File(REPORTS_FILE);
         
@@ -295,8 +256,7 @@ public class DataService {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
                 if (line.isEmpty() || line.startsWith("#")) continue;
-                // Parsing would need to reconstruct Report objects from text
-                // This is handled separately by the application logic
+               
             }
             System.out.println("[DataService] Reports loaded from " + REPORTS_FILE + " (" + reports.size() + " reports)");
         } catch (IOException e) {
@@ -306,9 +266,6 @@ public class DataService {
         return reports;
     }
 
-    /**
-     * Clear all data files (for reset/cleanup)
-     */
     public static void clearAllData() {
         File[] files = {
             new File(USERS_FILE),

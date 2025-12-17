@@ -9,8 +9,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.time.LocalDate;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerDateModel;
 import java.util.Date;
 
 public class CompoundManagementGUI extends JFrame {
@@ -224,8 +222,8 @@ public class CompoundManagementGUI extends JFrame {
         }
     }
 
-    // =========================================================================
-    // 2. SIGN UP PANEL
+   // =========================================================================
+    // 2. SIGN UP PANEL (UPDATED)
     // =========================================================================
     private JPanel createSignUpPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -300,18 +298,30 @@ public class CompoundManagementGUI extends JFrame {
                 String email = emailF.getText().trim();
                 String phone = phoneF.getText().trim();
                 String nationalID = nidF.getText().trim();
-                
-                // Validate for duplicates
-                String validationError = validateDuplicates(email, phone, nationalID);
-                if (validationError != null) {
-                    JOptionPane.showMessageDialog(this, validationError, "Duplicate Data", JOptionPane.WARNING_MESSAGE);
+
+                // 1. Validate Required Fields
+                if (nameF.getText().trim().isEmpty() || userF.getText().trim().isEmpty() ||
+                    email.isEmpty() || phone.isEmpty() || nationalID.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Please fill in all required fields!");
                     return;
                 }
 
-                // Validate required fields are not empty
-                if (nameF.getText().trim().isEmpty() || userF.getText().trim().isEmpty() || 
-                    email.isEmpty() || phone.isEmpty() || nationalID.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Please fill in all required fields!");
+                // 2. NEW VALIDATION: Phone Number (11 Digits)
+                if (phone.length() != 11 || !phone.matches("\\d+")) {
+                    JOptionPane.showMessageDialog(this, "Invalid Phone Number: Must be exactly 11 digits.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // 3. NEW VALIDATION: National ID (14 Digits)
+                if (nationalID.length() != 14 || !nationalID.matches("\\d+")) {
+                    JOptionPane.showMessageDialog(this, "Invalid National ID: Must be exactly 14 digits.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // 4. Validate for duplicates (Backend check)
+                String validationError = validateDuplicates(email, phone, nationalID);
+                if (validationError != null) {
+                    JOptionPane.showMessageDialog(this, validationError, "Duplicate Data", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
@@ -331,7 +341,7 @@ public class CompoundManagementGUI extends JFrame {
                 JOptionPane.showMessageDialog(this, "Account Created Successfully!");
                 cardLayout.show(mainContainer, LOGIN_VIEW);
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Error: Age and Numbers must be integers.");
+                JOptionPane.showMessageDialog(this, "Error: Age must be a number.");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
             }

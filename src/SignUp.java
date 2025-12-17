@@ -11,7 +11,6 @@ public class SignUp {
     private ArrayList<person> users = new ArrayList<>();
 
     public SignUp() {
-        // Load users from file on initialization
         this.users = DataService.loadUsers();
     }
 
@@ -23,7 +22,6 @@ public class SignUp {
         DataService.saveUsers(users);
     }
 
-    // Validation method to check for duplicate data
     public String validateDuplicates(String email, String phone, String nationalID) {
         for (person user : users) {
             if (user.getEmail().equalsIgnoreCase(email)) {
@@ -36,7 +34,7 @@ public class SignUp {
                 return "National ID already registered!";
             }
         }
-        return null; // No duplicates found
+        return null; 
     }
 
     public void createAccount() {
@@ -77,7 +75,6 @@ public class SignUp {
         System.out.print("enter dependants: ");
         String dependants = scanner.nextLine();
 
-        // Validate for duplicates
         String validationError = validateDuplicates(email, phone, nationalID);
         if (validationError != null) {
             System.out.println("ERROR: " + validationError);
@@ -94,18 +91,17 @@ public class SignUp {
 
             person r = new Resident(password , username , name , age, nationalID , phone , email , role , dependants ,apartmentNumber2,buildingNumber);
             users.add(r);
-            saveUsers(); // Save after adding
+            saveUsers(); 
 
             System.out.println("Resident created successfully!");
 
         } else if (choice.equals("2")) {
 
-            System.out.print("Enter Job Title: ");
-            String jobTitle = scanner.nextLine();
+           
 
             person s = new Staff(password, username, name, age, nationalID, phone,email,role,dependants);
             users.add(s);
-            saveUsers(); // Save after adding
+            saveUsers();
 
             System.out.println("Staff created successfully!");
         }

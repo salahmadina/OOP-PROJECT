@@ -2,3 +2,6 @@
 000|malak|malak khaled|19|1234567899876546|1095566625|malak@gmail.com|Resident|selim|9|1
 000|salma|salma hakim|22|1234567899876541|1022374454|salma@gmail.com|Resident|zein|2|4
 000|mogy|mogy|23|123456789876546|1000000000|n@|Resident|g|0|0
+000|nour|nour|22|1234567899876520|10000000|nour@|Resident|h|0|0
+n|n|n|22|12345678998765432|1000000000|nh@|Resident|None|0|0
+c|c|j|22|123456789|100|c@|Resident|None|0|0
